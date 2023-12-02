@@ -40,9 +40,8 @@ function match(string) {
   let found;
   let previousIndex = 0;
   while ((found = regexp.exec(string))) {
-    if (found[0]) {
-      matches.push(convert(found[0]));
-    }
+    matches.push(convert(found[0]));
+
     if (found[0].length > 1) {
       regexp.lastIndex -= 1;
     }
