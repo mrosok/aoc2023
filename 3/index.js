@@ -1,5 +1,4 @@
 import fs from "fs";
-import { clearScreenDown } from "readline";
 
 const GRID = fs
   .readFileSync("./input.txt", "utf-8")
@@ -22,11 +21,27 @@ function part1() {
       }
     }
   }
-  //console.log(numbers);
   console.log(numbers.reduce((s, v) => s + v));
 }
 
-part1();
+//part1();
+
+function part2() {
+  let numbers = [];
+  const re = /\*/;
+  let found;
+  for (let x in GRID) {
+    for (let y in GRID[x]) {
+      found = GRID[x][y].match(re);
+      if (found) {
+        const hits = searchProximity(x, y);
+        if (hits.length == 2) numbers.push(hits[0] * hits[1]);
+      }
+    }
+  }
+  console.log(numbers.reduce((s, v) => s + v));
+}
+part2();
 
 function searchProximity(x, y) {
   x = Number(x);
@@ -35,11 +50,9 @@ function searchProximity(x, y) {
   let found;
   let hits = [];
   let current = "";
-  //console.log(`found symbol at ${x}, ${y}`);
   if (x > 0 && y > 0) {
     //look up-left
     current = GRID[x - 1][y - 1];
-    //console.log(`looking up-left: ${current}`);
     found = current.match(re);
   }
   if (found) hits.push(findNumber(x - 1, y - 1));
@@ -47,7 +60,6 @@ function searchProximity(x, y) {
   if (x > 0) {
     //look up
     current = GRID[x - 1][y];
-    //console.log(`looking up: ${current}`);
     found = current.match(re);
   }
   if (found) hits.push(findNumber(x - 1, y));
@@ -55,7 +67,6 @@ function searchProximity(x, y) {
   if (x > 0 && y < COLUMNS - 1) {
     //look up-right
     current = GRID[x - 1][y + 1];
-    //console.log(`looking up-right: ${current}`);
     found = current.match(re);
   }
   if (found) hits.push(findNumber(x - 1, y + 1));
@@ -63,7 +74,6 @@ function searchProximity(x, y) {
   if (y > 0) {
     //look left
     current = GRID[x][y - 1];
-    //console.log(`looking left: ${current}`);
     found = current.match(re);
   }
   if (found) hits.push(findNumber(x, y - 1));
@@ -71,7 +81,6 @@ function searchProximity(x, y) {
   if (y < COLUMNS - 1) {
     //look right
     current = GRID[x][y + 1];
-    //console.log(`looking right: ${current}`);
     found = current.match(re);
   }
   if (found) hits.push(findNumber(x, y + 1));
@@ -79,7 +88,6 @@ function searchProximity(x, y) {
   if (x < ROWS - 1 && y > 0) {
     //look down-left
     current = GRID[x + 1][y - 1];
-    //console.log(`looking down-left: ${current}`);
     found = current.match(re);
   }
   if (found) hits.push(findNumber(x + 1, y - 1));
@@ -87,7 +95,6 @@ function searchProximity(x, y) {
   if (x < ROWS - 1) {
     //look down
     current = GRID[x + 1][y];
-    //console.log(`looking down: ${current}`);
     found = current.match(re);
   }
   if (found) hits.push(findNumber(x + 1, y));
@@ -95,7 +102,6 @@ function searchProximity(x, y) {
   if (x < ROWS - 1 && y < COLUMNS - 1) {
     //look down-right
     current = GRID[x + 1][y + 1];
-    //console.log(`looking down-right: ${current}`);
     found = current.match(re);
   }
   if (found) hits.push(findNumber(x + 1, y + 1));
@@ -113,21 +119,17 @@ function findNumber(x, y) {
   let found;
 
   while (y >= 0 && (found = GRID[x][y].match(re)) != null) {
-    //console.log(found, y);
     y--;
   }
   startIndex = y + 1;
   y = startIndex;
   while (y < COLUMNS && (found = GRID[x][y].match(re)) != null) {
-    //console.log(found, y);
     y++;
   }
   endIndex = y;
-  //console.log(startIndex, endIndex);
   for (let i = startIndex; i < endIndex; i++) {
     numArr.push(GRID[x][i]);
     GRID[x][i] = ".";
   }
-  //console.log(numArr);
   return Number(numArr.join(""));
 }
