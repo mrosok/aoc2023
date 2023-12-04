@@ -26,13 +26,9 @@ function part1() {
 part1();
 
 function calculatePoints(hits) {
-  let points = 1;
-    if (hits <= 1) {
-      points = hits;
-    } else {
-      for (let i=0; i<hits-1; i++) {
-        points *= 2;
-      }
-    }
+  let points = 0
+  for (let i=0; i<hits; i++) {
+    points = (i == 0) ? 1 : points * 2;
+  }
     return points;
 }
