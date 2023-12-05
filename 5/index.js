@@ -19,12 +19,9 @@ seedsToSoil = seedsToSoil.split("\n").slice(1);
 soilToFertilizer = soilToFertilizer.split("\n").slice(1);
 fertilizerToWater = fertilizerToWater.split("\n").slice(1);
 waterToLight = waterToLight.split("\n").slice(1);
-lightToTemperature = lightToTemperature.split("\n");
-lightToTemperature.shift();
-temperatureToHumidity = temperatureToHumidity.split("\n");
-temperatureToHumidity.shift();
-humidityToLocation = humidityToLocation.split("\n");
-humidityToLocation.shift();
+lightToTemperature = lightToTemperature.split("\n").slice(1);
+temperatureToHumidity = temperatureToHumidity.split("\n").slice(1);
+humidityToLocation = humidityToLocation.split("\n").slice(1);
 
 function part1() {
   const locations = [];
