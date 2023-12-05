@@ -1,65 +1,60 @@
 import fs from "fs";
-const lines = fs.readFileSync("./input.txt", "utf-8").trim().split("\n");
+let [
+  seeds,
+  seedsToSoil,
+  soilToFertilizer,
+  fertilizerToWater,
+  waterToLight,
+  lightToTemperature,
+  temperatureToHumidity,
+  humidityToLocation,
+] = fs.readFileSync("./input.txt", "utf-8").trim().split("\n\n");
+
+//must be a way to do this cleaner
+seeds = seeds
+  .split(" ")
+  .map(Number)
+  .filter((n) => n);
+seedsToSoil = seedsToSoil.split("\n");
+seedsToSoil.shift();
+soilToFertilizer = soilToFertilizer.split("\n");
+soilToFertilizer.shift();
+fertilizerToWater = fertilizerToWater.split("\n");
+fertilizerToWater.shift();
+waterToLight = waterToLight.split("\n");
+waterToLight.shift();
+lightToTemperature = lightToTemperature.split("\n");
+lightToTemperature.shift();
+temperatureToHumidity = temperatureToHumidity.split("\n");
+temperatureToHumidity.shift();
+humidityToLocation = humidityToLocation.split("\n");
+humidityToLocation.shift();
 
 function part1() {
-  let sumPoints = [];
-  lines.forEach((line) => {
-    let [id, numbers] = line.split(": ");
-    let [winningNumbers, userNumbers] = numbers.split(" | ");
-    winningNumbers = winningNumbers
-      .split(" ")
-      .filter((n) => n)
-      .map(Number);
-    userNumbers = userNumbers
-      .split(" ")
-      .filter((n) => n)
-      .map(Number);
-    let hits = 0;
-    for (let i in userNumbers) {
-      if (winningNumbers.includes(userNumbers[i])) {
-        hits++;
-      }
-    }
-    if (hits) {
-      sumPoints.push(2 ** (hits - 1));
-    }
+  const locations = [];
+  seeds.forEach((seed) => {
+    const soil = travel(seedsToSoil, seed);
+    const fertilizer = travel(soilToFertilizer, soil);
+    const water = travel(fertilizerToWater, fertilizer);
+    const light = travel(waterToLight, water);
+    const temperature = travel(lightToTemperature, light);
+    const humidity = travel(temperatureToHumidity, temperature);
+    const location = travel(humidityToLocation, humidity);
+    locations.push(location);
   });
-  console.log(sumPoints.reduce((s, v) => s + v));
+  console.log(Math.min(...locations));
 }
 
 part1();
 
-function part2() {
-  let cardCount = new Array(lines.length).fill(1);
-
-  lines.forEach((line, index) => {
-    let [id, numbers] = line.split(": ");
-    let [winningNumbers, userNumbers] = numbers.split(" | ");
-    winningNumbers = winningNumbers
-      .split(" ")
-      .filter((n) => n)
-      .map(Number);
-    userNumbers = userNumbers
-      .split(" ")
-      .filter((n) => n)
-      .map(Number);
-    let hits = 0;
-    for (let i in userNumbers) {
-      if (winningNumbers.includes(userNumbers[i])) {
-        hits++;
-      }
-    }
-    if (hits) {
-      for (let i = index + 1; i < index + 1 + hits; i++) {
-        if (cardCount[i]) {
-          cardCount[i] += cardCount[index];
-        }
-      }
+function travel(arr, source) {
+  let destination;
+  arr.forEach((line) => {
+    const [destRange, startRange, length] = line.split(" ").map(Number);
+    if (source >= startRange && source <= startRange + length) {
+      let i = source - startRange;
+      destination = destRange + i;
     }
   });
-  console.log(cardCount.reduce((s, v) => s + v));
+  return destination ? destination : source;
 }
-
-//part2();
-const array = [1, 2, 3, 4];
-console.log(array.map((i) => i + 2));
