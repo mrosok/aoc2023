@@ -1,7 +1,5 @@
 import fs from "fs";
 const lines = fs.readFileSync("./input.txt", "utf-8").trim().split("\n");
-
-let hands = [];
 const values = {
   J: 1,
   2: 2,
@@ -18,27 +16,34 @@ const values = {
   A: 14,
 };
 
-function sortHands(a, b) {
-  if (a.score < b.score) {
-    return -1;
-  }
-  if (a.score > b.score) return 1;
+let hands = [];
+lines.forEach((line) => {
+  const [cards, bid] = line.split(" ");
+  let hand = {};
+  hand.cards = cards;
+  hand.sorted = [...cards].sort((a, b) => a.localeCompare(b)).join("");
+  hand.score = giveScore(hand.sorted);
+  hand.bid = Number(bid);
+  hands.push(hand);
+});
 
+let sum = 0;
+hands.sort(sortHands);
+console.log(hands.reduce((acc, cur, i) => acc + cur.bid * (i + 1), sum));
+
+function sortHands(a, b) {
+  if (a.score < b.score) return -1;
+  if (a.score > b.score) return 1;
   if (a.score == b.score) {
-    let aCards = a.cards.split("");
-    let bCards = b.cards.split("");
-    for (let i in aCards) {
-      const aValue = values[aCards[i]];
-      const bValue = values[bCards[i]];
-      if (aValue < bValue) return -1;
-      if (aValue > bValue) return 1;
+    for (let i in a.cards) {
+      if (values[a.cards[i]] < values[b.cards[i]]) return -1;
+      if (values[a.cards[i]] > values[b.cards[i]]) return 1;
       continue;
     }
     return 0;
   }
 }
-
-function giveScore(hand) {
+function groupCards(hand) {
   const jokers = (hand.match(/J/g) || []).length;
   hand = hand.replaceAll("J", "");
   if (!hand) return 7; //all jokers
@@ -53,58 +58,34 @@ function giveScore(hand) {
   //add jokers to largest group
   groups.sort((a, b) => b.length - a.length);
   for (let i = 0; i < jokers; i++) {
-    groups[0] = groups[0] + groups[0][0];
+    groups[0] += groups[0][0];
   }
+  return groups;
+}
+
+function giveScore(hand) {
+  const groups = groupCards(hand);
 
   switch (groups.length) {
     case 1:
-      return 7;
-      break;
+      return 7; //five of a kind
     case 2:
-      if (groups[0].length == 4 || groups[1].length == 4) {
-        return 6;
+      if (groups[0].length == 4) {
+        return 6; //four of a kind
       } else {
-        return 5;
+        return 5; //full house
       }
-      break;
     case 3:
-      if (
-        groups[0].length == 3 ||
-        groups[1].length == 3 ||
-        groups[2].length == 3
-      ) {
-        return 4;
+      if (groups[0].length == 3) {
+        return 4; //three of a kind
       } else {
-        return 3;
+        return 3; //two pairs
       }
-      break;
     case 4:
-      return 2;
-      break;
+      return 2; //one pair
     case 5:
-      return 1;
-      break;
+      return 1; //high card
     default:
       return -1;
   }
 }
-
-lines.forEach((line) => {
-  let sortString = (str) => {
-    return [...str].sort((a, b) => a.localeCompare(b)).join("");
-  };
-  let hand = {};
-  const [cards, bid] = line.split(" ");
-  hand.cards = cards;
-  hand.sorted = sortString(cards);
-  hand.score = giveScore(hand.sorted);
-  hand.bid = Number(bid);
-  hands.push(hand);
-});
-
-let sum = 0;
-hands.sort(sortHands);
-hands.forEach((hand, index) => {
-  sum += hand.bid * (index + 1);
-});
-console.log(sum);
