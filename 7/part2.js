@@ -39,28 +39,19 @@ function sortHands(a, b) {
 }
 
 function giveScore(hand) {
-  let groups = [];
-  let jokers = 0;
-  let found;
-
-  for (let i in hand) {
-    if (hand[i] == "J") {
-      jokers++;
-    }
-  }
+  const jokers = (hand.match(/J/g) || []).length;
   hand = hand.replaceAll("J", "");
-  if (!hand) {
-    return 7;
-  }
+  if (!hand) return 7; //all jokers
 
+  let groups = [];
+  let found;
   let re = /(.)\1*/g;
 
   while ((found = re.exec(hand))) {
     groups.push(found[0]);
   }
-
+  //add jokers to largest group
   groups.sort((a, b) => b.length - a.length);
-
   for (let i = 0; i < jokers; i++) {
     groups[0] = groups[0] + groups[0][0];
   }
