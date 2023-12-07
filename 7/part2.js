@@ -1,5 +1,5 @@
 import fs from "fs";
-const lines = fs.readFileSync("./example.txt", "utf-8").trim().split("\n");
+const lines = fs.readFileSync("./input.txt", "utf-8").trim().split("\n");
 
 let hands = [];
 const values = {
@@ -38,14 +38,33 @@ function sortHands(a, b) {
   }
 }
 
-function giveScore(card) {
+function giveScore(hand) {
   let groups = [];
+  let jokers = 0;
   let found;
+
+  for (let i in hand) {
+    if (hand[i] == "J") {
+      jokers++;
+    }
+  }
+  hand = hand.replaceAll("J", "");
+  if (!hand) {
+    return 7;
+  }
+
   let re = /(.)\1*/g;
 
-  while ((found = re.exec(card))) {
+  while ((found = re.exec(hand))) {
     groups.push(found[0]);
   }
+
+  groups.sort((a, b) => b.length - a.length);
+
+  for (let i = 0; i < jokers; i++) {
+    groups[0] = groups[0] + groups[0][0];
+  }
+
   switch (groups.length) {
     case 1:
       return 7;
@@ -91,6 +110,7 @@ lines.forEach((line) => {
   hand.bid = Number(bid);
   hands.push(hand);
 });
+
 let sum = 0;
 hands.sort(sortHands);
 hands.forEach((hand, index) => {
