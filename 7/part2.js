@@ -1,8 +1,9 @@
 import fs from "fs";
-const lines = fs.readFileSync("./input.txt", "utf-8").trim().split("\n");
+const lines = fs.readFileSync("./example.txt", "utf-8").trim().split("\n");
 
 let hands = [];
 const values = {
+  J: 1,
   2: 2,
   3: 3,
   4: 4,
@@ -12,33 +13,10 @@ const values = {
   8: 8,
   9: 9,
   T: 10,
-  J: 11,
   Q: 12,
   K: 13,
   A: 14,
 };
-
-lines.forEach((line) => {
-  let sortString = (str) => {
-    return [...str].sort((a, b) => a.localeCompare(b)).join("");
-  };
-  let hand = {};
-  const [cards, bid] = line.split(" ");
-  hand.cards = cards;
-  hand.sorted = sortString(cards);
-  hand.score = giveScore(hand.sorted);
-  hand.bid = Number(bid);
-  hands.push(hand);
-});
-
-function part1() {
-  let sum = 0;
-  hands.sort(sortHands);
-  hands.forEach((hand, index) => {
-    sum += hand.bid * (index + 1);
-  });
-  console.log(sum);
-}
 
 function sortHands(a, b) {
   if (a.score < b.score) {
@@ -59,8 +37,6 @@ function sortHands(a, b) {
     return 0;
   }
 }
-
-part1();
 
 function giveScore(card) {
   let groups = [];
@@ -102,3 +78,22 @@ function giveScore(card) {
       return -1;
   }
 }
+
+lines.forEach((line) => {
+  let sortString = (str) => {
+    return [...str].sort((a, b) => a.localeCompare(b)).join("");
+  };
+  let hand = {};
+  const [cards, bid] = line.split(" ");
+  hand.cards = cards;
+  hand.sorted = sortString(cards);
+  hand.score = giveScore(hand.sorted);
+  hand.bid = Number(bid);
+  hands.push(hand);
+});
+let sum = 0;
+hands.sort(sortHands);
+hands.forEach((hand, index) => {
+  sum += hand.bid * (index + 1);
+});
+console.log(sum);
