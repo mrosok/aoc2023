@@ -18,8 +18,8 @@ const values = {
 
 let hands = [];
 lines.forEach((line) => {
-  const [cards, bid] = line.split(" ");
   let hand = {};
+  const [cards, bid] = line.split(" ");
   hand.cards = cards;
   hand.sorted = [...cards].sort((a, b) => a.localeCompare(b)).join("");
   hand.score = giveScore(hand.sorted);
@@ -32,8 +32,11 @@ hands.sort(sortHands);
 console.log(hands.reduce((acc, cur, i) => acc + cur.bid * (i + 1), sum));
 
 function sortHands(a, b) {
-  if (a.score < b.score) return -1;
+  if (a.score < b.score) {
+    return -1;
+  }
   if (a.score > b.score) return 1;
+
   if (a.score == b.score) {
     for (let i in a.cards) {
       if (values[a.cards[i]] < values[b.cards[i]]) return -1;
@@ -43,8 +46,9 @@ function sortHands(a, b) {
     return 0;
   }
 }
-function groupCards(hand) {
-  const jokers = (hand.match(/J/g) || []).length;
+
+function giveScore(hand) {
+  let jokers = (hand.match(/J/g) || []).length;
   hand = hand.replaceAll("J", "");
   if (!hand) return 7; //all jokers
 
@@ -58,13 +62,8 @@ function groupCards(hand) {
   //add jokers to largest group
   groups.sort((a, b) => b.length - a.length);
   for (let i = 0; i < jokers; i++) {
-    groups[0] += groups[0][0];
+    groups[0] = groups[0] + groups[0][0];
   }
-  return groups;
-}
-
-function giveScore(hand) {
-  const groups = groupCards(hand);
 
   switch (groups.length) {
     case 1:
