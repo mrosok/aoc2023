@@ -62,7 +62,7 @@ function giveScore(hand) {
   //add jokers to largest group
   groups.sort((a, b) => b.length - a.length);
   for (let i = 0; i < jokers; i++) {
-    groups[0] = groups[0] + groups[0][0];
+    groups[0] += groups[0][0];
   }
 
   switch (groups.length) {
